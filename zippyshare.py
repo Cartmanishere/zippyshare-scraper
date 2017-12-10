@@ -89,6 +89,7 @@ class ZippyLink():
 				part_3 = parts.group(8)
 
 				link = "{}/{}{}".format(part_1, part_2, part_3)
+				link = re.sub('/pd/', '/d/', link)
 
 				return link, True		
 

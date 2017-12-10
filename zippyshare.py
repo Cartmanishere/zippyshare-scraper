@@ -10,17 +10,19 @@ class ZippyLink():
 		self.zippy = []
 		self._links = []
 		self.REGEX_2 = r'(\")(.*)(\/\") (\+) (.*) (\+) (\")(.*)(\")'
+		self._session = requests.Session()
 
-	def domain(self):
+	def do_main(self):
 		''' Main function which returns the list of download links '''
 
 		self.get_links()
 		print("Total Links = "+str(len(self.zippy)))
 		for i in self.zippy:
-			link, status = self.parse_link(i)
+			extract, status = self.parse_link(i)
 			if status:
-				p = self.get_domain(i)[:-1]+link
-				print(p)
+				p = self.get_domain(i)[:-1]+extract
+				p, count = self.remove_redirects(p)
+				print("Redirects Removed = {}\tLink = {}".format(count, p))
 				self._links.append(p)
 
 		return self._links
@@ -55,13 +57,39 @@ class ZippyLink():
 
 	def get_text_block(self, link):
 		''' Extracts the part that contains the expression '''
-		r = requests.get(link)
+		r = self._session.get(link)
 		soup = BeautifulSoup(r.content, "lxml")
 		text = ''
 		for i in soup.find_all("script"):
 			text += i.text
 
 		return text
+
+
+	def remove_redirects(self, link):
+		''' Removes zippyshare redirects for ad and return direct downloadable link '''
+		count = -1
+		headers = {"Range": "bytes=0-200"}
+		new_link = link
+		while True:
+			count += 1
+			p = self._session.get(new_link, headers=headers)
+			if p.headers.get('Content-Type', None) == None:
+				print("No content-type header sent. Manually analyse the following link.")
+				print(new_link)
+				exit()
+			else:
+				if p.headers.get('Content-Type') == 'text/html;charset=UTF-8':
+					extract, status = self.parse_link(new_link)
+					if status:
+						new_link = self.get_domain(new_link)[:-1]+extract
+
+				else:
+					if p.content != None:
+						''' The link is probably clear at this point but can't be sure if there are some hidden redirects'''
+						return new_link, count
+
+
 
 	def parse_link(self, link):
 		''' Isolate the expression and extract and make the link '''
@@ -88,16 +116,16 @@ class ZippyLink():
 				part_2 = eval(parts.group(5))
 				part_3 = parts.group(8)
 
-				link = "{}/{}{}".format(part_1, part_2, part_3)
-				link = re.sub('/pd/', '/d/', link)
+				extract = "{}/{}{}".format(part_1, part_2, part_3)
+				extract = re.sub('/pd/', '/d/', extract)
 
-				return link, True		
+				return extract, True		
 
 
 
 if __name__ == "__main__":
 	parser = ZippyLink()
-	links = parser.domain()
+	links = parser.do_main()
 	file = open('links.txt', 'w')
 	for i in links:
 		file.write(i+"\n")

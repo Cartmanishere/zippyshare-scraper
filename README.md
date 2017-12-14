@@ -49,11 +49,3 @@ This script is particularly useful when working on remote servers where you don'
 
 This project is licensed under the terms of the MIT license.
 
-
-
-
-
-
-
-
-

@@ -1,8 +1,8 @@
 import re
+import json
 import requests
-from bs4 import BeautifulSoup
-from pprint import pprint
 import urllib.parse
+from bs4 import BeautifulSoup
 
 class ZippyLink():
 	def __init__(self):
@@ -33,18 +33,18 @@ class ZippyLink():
 	def get_links(self, links=None):
 		if links == None:
 			''' Get zippyshare links from user or file '''
-			opt = input("File(f) or List(l)? ")
-			if opt == 'f' or opt=='F':
+			opt = input("File(f) | List(l) | dlcfile (d)? ")
+			if opt.lower() == 'f':
 				try:
 					file = open(input("File path: "), "r")
 					links = tuple(file)
-					links = [ i[:-1] for i in links ]
+					links = [ i for i in links if i != '' ]
 					print("File found. Beginning scraping.")
 				except Exception as e:
 					print(e)
 					exit()
 
-			else:
+			elif opt.lower() == 'l':
 				links = []
 				while True:
 					n = input("Link (leave blank to terminate): ")
@@ -52,6 +52,33 @@ class ZippyLink():
 						links.append(n)
 					else:
 						break
+
+			elif opt.lower()=='d':
+				dlcfile = input('Enter path of dlc file: ')
+				if dlcfile[-3:] != 'dlc':
+					print("This is not a dlc file.")
+					exit()
+				try:
+					post_data = {'content': open(dlcfile, 'r').read()}
+					r = requests.post('http://dcrypt.it/decrypt/paste', data=post_data)
+					if r.status_code == 200:
+						jobj = json.loads(r.content.decode())
+						if jobj.get('success', None) != None:
+							links = jobj.get('success').get('links', [])
+						else:
+							print("DLC file decryption failed.")
+							exit()
+					else:
+						print("DLC file decryption failed.")
+						exit()
+				except Exception as e:
+					print(e)
+					exit()
+
+			else:
+				print('\nPlease enter correct option.\n\n')
+				exit()
+
 
 		self.zippy = links
 

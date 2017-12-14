@@ -38,7 +38,8 @@ class ZippyLink():
 				try:
 					file = open(input("File path: "), "r")
 					links = tuple(file)
-					links = [ i for i in links if i != '' ]
+					file.close()
+					links = [ i[:-1] for i in links if (i != '' and i != '\n') ]
 					print("File found. Beginning scraping.")
 				except Exception as e:
 					print(e)

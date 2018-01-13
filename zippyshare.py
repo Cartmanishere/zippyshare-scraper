@@ -50,7 +50,8 @@ class ZippyLink():
 				while True:
 					n = input("Link (leave blank to terminate): ")
 					if n != "":
-						links.append(n)
+						if n!='' and re.search(r'http:\/\/', n)!=None:
+							links.append(n)
 					else:
 						break
 

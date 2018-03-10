@@ -9,7 +9,8 @@ class ZippyLink():
 		self.REGEX_1 = r'(\(\'dlbutton\'\)\.href = )(.*)(\;)'
 		self.zippy = []
 		self._links = []
-		self.REGEX_2 = r'(\")(.*)(\/\") (\+) (.*) (\+) (\")(.*)(\")'
+		self.REGEX_2 = r'(\")(.*)(\/\")(.*)(\")(.*)(\")'
+		self.REGEX_3 = r'(var a = )([0-9]+);'
 		self._session = requests.Session()
 
 	def do_main(self):
@@ -133,23 +134,35 @@ class ZippyLink():
 			return None, False
 		else:
 			expression = matcher.group(2)
+
 			parts = re.search(self.REGEX_2, expression)
 
 			if parts == None:
-				# matching failed
-				print("REGEX_2 Failed.")
-
+			 	# matching failed
+			 	print("REGEX_2 Failed.")
+			 	print(expression)
+			 	return None, False
+			a = self.get_value_of_a(block)
+			if a == None:
+				print("REGEX 3 failed.")
 				return None, False
 			else:
 				part_1 = parts.group(2)
-				part_2 = eval(parts.group(5))
-				part_3 = parts.group(8)
+				part_2 = str(a**3 + 3)
+				part_3 = parts.group(6)
 
 				extract = "{}/{}{}".format(part_1, part_2, part_3)
 				extract = re.sub('/pd/', '/d/', extract)
 
 				return extract, True		
 
+	def get_value_of_a(self, script_block):
+		matcher = re.search(self.REGEX_3, script_block)
+		if matcher == None:
+			return None
+
+		a = int(matcher.group(2))
+		return a
 
 
 if __name__ == "__main__":

@@ -6,6 +6,10 @@ This script instead extracts the real download link from the page. You can direc
 
 This script is particularly useful when working on remote servers where you don't have access to gui software.
 
+### NOTICE :
+
+Zippyshare recently changed their page source code. If you were using a previous version of this script, it will fail invariably. Use the latest updated version.
+
 ### Dependencies :
 
 1. You need Python 3 environment to execute the script. You can easily install it from [here](https://www.python.org/downloads/).

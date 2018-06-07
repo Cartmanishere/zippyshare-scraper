@@ -13,6 +13,7 @@ class ZippyLink():
 		self.REGEX_2 = r'(\")(.*)(\/\"\ \+\ )(.*)(\ \+\ \")(.*)(\")'
 		self.REGEX_3 = r'(var a = )([0-9]+);'
 		self._session = requests.Session()
+		self.REGEX_4 = r'((\")(.*)(\"))\+(\((.*)\))\+(\"(.*)\")'
 
 	def do_main(self):
 		''' Main function which returns the list of download links '''
@@ -89,9 +90,9 @@ class ZippyLink():
 	def get_text_block(self, link):
 		''' Extracts the part that contains the expression '''
 		r = self._session.get(link)
-		soup = BeautifulSoup(r.content, "lxml")
+		self.soup = BeautifulSoup(r.content, "lxml")
 		text = ''
-		for i in soup.find_all("script"):
+		for i in self.soup.find_all("script"):
 			text += i.text
 
 		return text
@@ -135,11 +136,10 @@ class ZippyLink():
 			return None, False
 		else:
 			expression = matcher.group(2)
-			parts = re.search(self.REGEX_2, expression)
-
+			parts = re.search(self.REGEX_4, expression)
 			if parts == None:
 				# matching failed
-				print("REGEX_2 Failed.")
+				print("REGEX_4 Failed.")
 				print(expression)
 			#  	return None, False
 			# a = self.get_value_of_a(block)
@@ -147,13 +147,22 @@ class ZippyLink():
 			# 	print("REGEX 3 failed.")
 				return None, False
 			else:
-				part_1 = parts.group(2)
+				part_1 = parts.group(3)
 				# part_2 = str(a**3 + 3)
-				part_3 = parts.group(6)
-				part_2 = eval(parts.group(4))
-				# part_3 = parts.group(8)
+				part_3 = parts.group(8)
 
-				extract = "{}/{}{}".format(part_1, part_2, part_3)
+				arith_exp = parts.group(5)
+				d = self.get_value_of_d()
+				def a(): return 1
+				def b(): return a() + 1
+				def c(): return b() + 1
+
+
+
+				part_2 = int(eval(arith_exp))
+				#print(part_1, part_2, part_3)
+				# part_3 = parts.group(8)
+				extract = "{}{}{}".format(part_1, part_2, part_3)
 				extract = re.sub('/pd/', '/d/', extract)
 
 				return extract, True		
@@ -165,6 +174,9 @@ class ZippyLink():
 
 		a = int(matcher.group(2))
 		return a
+
+	def get_value_of_d(self):
+		return int(self.soup.select('span[id="omg"]')[0].get('class')[0]) * 2
 
 
 if __name__ == "__main__":

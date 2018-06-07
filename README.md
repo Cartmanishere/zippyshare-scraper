@@ -8,7 +8,7 @@ This script is particularly useful when working on remote servers where you don'
 
 ### NOTICE :
 
-Zippyshare recently changed their page source code. If you were using a previous version of this script, it will fail invariably. Use the latest updated version.
+Use the new zippyshare.py code. Zippyshare changed their source code. If you find that it isn't working, try the old one. Maybe they switched back. If both of these aren't working, then I'll update the repo with a working script soon.
 
 ### Dependencies :
 

@@ -10,7 +10,7 @@ class ZippyLink():
 		self.zippy = []
 		self._links = []
 		# self.REGEX_2 = r'(\")(.*)(\/\")(.*)(\")(.*)(\")'
-		self.REGEX_2 = r'(\")(.*)(\/\"\ \+\ )(.*)(\ \+\ \")(.*)(\")'
+		self.REGEX_2 = r'(\".*\")(\+)(.*)(\+)(\".*\")'
 		self.REGEX_3 = r'(var a = )([0-9]+);'
 		self._session = requests.Session()
 
@@ -147,13 +147,18 @@ class ZippyLink():
 			# 	print("REGEX 3 failed.")
 				return None, False
 			else:
-				part_1 = parts.group(2)
-				# part_2 = str(a**3 + 3)
-				part_3 = parts.group(6)
-				part_2 = eval(parts.group(4))
+
+				part_1 = parts.group(1).replace("\"", '')
+				a = self.get_value_of_a(block)
+				b = 3 # Currently hardcoded in their sourcecode
+
+				part_2 = (a ** 3) + b
+
+				part_3 = parts.group(5).replace('"', '')
+
 				# part_3 = parts.group(8)
 
-				extract = "{}/{}{}".format(part_1, part_2, part_3)
+				extract = "{}{}{}".format(part_1, part_2, part_3)
 				extract = re.sub('/pd/', '/d/', extract)
 
 				return extract, True		

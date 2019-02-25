@@ -2,6 +2,7 @@ import re
 import json
 import requests
 import urllib.parse
+import math
 from bs4 import BeautifulSoup
 
 class ZippyLink():
@@ -11,7 +12,7 @@ class ZippyLink():
 		self._links = []
 		# self.REGEX_2 = r'(\")(.*)(\/\")(.*)(\")(.*)(\")'
 		self.REGEX_2 = r'(\".*\")(\+)(.*)(\+)(\".*\")'
-		self.REGEX_3 = r'(var a = )([0-9]+);'
+		self.REGEX_3 = r'(var {} = )([0-9]+);'
 		self._session = requests.Session()
 
 	def do_main(self):
@@ -149,10 +150,11 @@ class ZippyLink():
 			else:
 
 				part_1 = parts.group(1).replace("\"", '')
-				a = self.get_value_of_a(block)
-				b = 3 # Currently hardcoded in their sourcecode
+				a = self.get_value_of_var(block, 'a')
+				b = self.get_value_of_var(block, 'b')
+				a = math.floor(a / 3)
 
-				part_2 = (a ** 3) + b
+				part_2 = eval(parts.group(3))
 
 				part_3 = parts.group(5).replace('"', '')
 
@@ -163,8 +165,8 @@ class ZippyLink():
 
 				return extract, True		
 
-	def get_value_of_a(self, script_block):
-		matcher = re.search(self.REGEX_3, script_block)
+	def get_value_of_var(self, script_block, var):
+		matcher = re.search(self.REGEX_3.format(var), script_block)
 		if matcher == None:
 			return None
 

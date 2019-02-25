@@ -8,7 +8,7 @@ This script is particularly useful when working on remote servers where you don'
 
 ### NOTICE :
 
-I'm keeping three different scripts. Each for a separate variation of zippyshare site source code. 
+Zippyshare keeps changing their source code.
 So while trying to decode links, try running all three scripts. And if you still get error, open a issue and I'll fix the code.
 I will also think of a way to combine these all into a one script. But in the meanwhile, you can use these as is or write a script based on these yourself.
 

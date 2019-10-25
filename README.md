@@ -12,9 +12,19 @@ This script extracts the real download link from the page. You can directly feed
 
 This script is useful when working on remote servers where you don't have access to gui software.
 
+### Reset Zippyshare Uploads:
+
+If you're a zippyshare uploader, you know that zippyshare uploads are taken down if they're not downloaded in last 30 days.
+
+You can use this script to reset the last download date without actually downloading the complete upload.
+
+This script initiates the download of the file to test whether the link is working. Because of this, the last downloaded date for the file is also updated.
+
+In this way, you can very easily extend the lifetime of your upload without wasting valuable time and bandwidth.
+
 ### NOTICE :
 
-Zippyshare constantly updates their source code on the webpage which breaks the link extraction. This script already takes care of 3 variations of the zippyshare webpage.
+Zippyshare sometimes updates their source code on the webpage which breaks the link extraction. This script already takes care of 3 variations of the zippyshare webpage.
 In case the script stops working due to one of their updates, please raise an issue and I will fix it asap.
 ### Dependencies :
 

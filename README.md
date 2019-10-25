@@ -1,17 +1,21 @@
-## Zippyshare Scraper :
+#### Updates:
 
-This is a simple script to get direct download links to files from zippyshare. If you've used zippyshare to download anything then you know that you have to go to their page and click on the download now button to get the download started.
+- Refactored the different variations of the zippyshare page into a single script.
+- Added multi-threading to speed up link extraction. 
+- Check the new usage method since that is also changed.
 
-This script instead extracts the real download link from the page. You can directly feed that link to a downloader to get your download started.
+## Zippyshare Scraper:
 
-This script is particularly useful when working on remote servers where you don't have access to gui software.
+This is a script to get direct download links to files from zippyshare. If you've used zippyshare to download anything then you know that you have to go to their page and click on the download now button to get the download started.
+
+This script extracts the real download link from the page. You can directly feed that link to a downloader to get your download started.
+
+This script is useful when working on remote servers where you don't have access to gui software.
 
 ### NOTICE :
 
-Zippyshare keeps changing their source code.
-So while trying to decode links, try running all three scripts. And if you still get error, open a issue and I'll fix the code.
-I will also think of a way to combine these all into a one script. But in the meanwhile, you can use these as is or write a script based on these yourself.
-
+Zippyshare constantly updates their source code on the webpage which breaks the link extraction. This script already takes care of 3 variations of the zippyshare webpage.
+In case the script stops working due to one of their updates, please raise an issue and I will fix it asap.
 ### Dependencies :
 
 1. You need Python 3 environment to execute the script. You can easily install it from [here](https://www.python.org/downloads/).
@@ -25,16 +29,24 @@ I will also think of a way to combine these all into a one script. But in the me
 
 * You can run the script directly like -
 ```python zippyshare.py```
-* You have 3 options to enter links.
 
-1. Using file: You can put the zippyshare links in a file. Each link on a new line.
+You have 3 options to enter links.
 
-2. Using list: Enter link in the terminal one by one
+* Using file: You can put the zippyshare links in a file. Each link on a new line.
+```
+python zippyshare.py --in-file <path_to_file_containing_links>
+```
+* Using dlc: Provide the path of the dlc file.
+```
+python zippyshare.py --dlc-file <path_to_dlc_file>
+```
+* Using list: Enter link in the terminal one by one
 
-3. Using dlc: Provide the path of the dlc file.
-
-* After the links are processed, the result is displayed on terminal as well as the direct downloadable links are written to a ```links.txt``` file in the current working directory.
-
+* After the links are processed, the result is displayed on terminal as well as the direct downloadable links are written to a ```links.txt``` file in the current working directory. 
+You can change the default output file as follows:
+```
+python zippyshare.py --out-file <output_file_path>
+```
 #### Examples :
 
 Example of unprocessed link (this type of link will be input): ```http://www120.zippyshare.com/v/7DpZTYfi/file.html```
@@ -53,12 +65,11 @@ Example of Direct Downloadable link: ```http://www120.zippyshare.com/d/7DpZTYfi/
 
 ### Known Issues :
 
-* You have to run the script on the same system which you are using for downloading otherwise some links may not work. ( Maybe Zippyshare uses IP logging to enable downloads ¯\\\_(ツ)_/¯ )
+* You have to run the script from the same network using which you are downloading files otherwise links may not work. 
 
 * The direct download links stop working after a few hours ( About 3-4 hrs, maybe). Don't know the exact time period.  At that point, you can rerun the script to get new download links to the same files which will work without problem.
 
-* The script runs into an error when the "File not exist" zippyshare page loads. I am working on a way to handle that situation so it gives appropriate output.
-
+* The script runs into an error when the "File not exist" zippyshare page loads. 
 ### License :
 
 This project is licensed under the terms of the MIT license.

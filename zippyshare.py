@@ -294,9 +294,3 @@ if __name__=="__main__":
             f.write(link + '\n')
         zippy.logger.info('All download links saved at {}'.format(args.outfile))
 
-"""
-https://www37.zippyshare.com/v/lzqhaBgQ/file.html
-https://www37.zippyshare.com/v/vjaiQ7hB/file.html
-https://www37.zippyshare.com/v/2vXuoAGl/file.html
-https://www37.zippyshare.com/v/mtRrPXpT/file.html
-"""

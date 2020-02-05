@@ -9,12 +9,11 @@ import json
 from concurrent.futures import as_completed, ThreadPoolExecutor
 
 
-
 class ZippyParser():
 
     def __init__(self):
         self.sess = requests.Session()
-        self.VAR_REGEX = r'(var {} = )([0-9]+);'
+        self.VAR_REGEX = r'(var {} = )([0-9%]+);'
         self.REGEX_1 = r'(\(\'dlbutton\'\)\.href = )(.*)(\;)'
         FORMAT = '[*] %(message)s'
         logging.basicConfig(level=logging.INFO, format=FORMAT)
@@ -57,7 +56,7 @@ class ZippyParser():
         if matcher is None:
             return None
 
-        var = int(matcher.group(2))
+        var = matcher.group(2)
         return var
 
     def get_download_link(self, link):
@@ -73,28 +72,22 @@ class ZippyParser():
             return extract, link
         else:
             # Try and figure out which pattern works
-            extract = self.pattern_1(soup)
-            if extract is not None:
-                self.parser = self.pattern_1
-                return extract, link
+            parsers = [self.pattern_1,
+                       self.pattern_2,
+                       self.pattern_3,
+                       self.pattern_4]
 
-            logging.warning("Pattern 1 has failed")
-            logging.warning("Trying pattern 2")
+            for parser_fn in parsers:
+                try:
+                    extract = parser_fn(soup)
+                    if extract is not None:
+                        self.parser = parser_fn
+                        return extract, link
+                    raise Exception
+                except Exception as e:
+                    logging.warning(parser_fn.__name__ + " has failed")
+                    logging.warning("Trying next pattern")
 
-            extract = self.pattern_2(soup)
-            if extract is not None:
-                self.parser = self.pattern_2
-                return extract, link
-
-            logging.warning("Pattern 2 has failed")
-            logging.warning("Trying pattern 3")
-
-            extract = self.pattern_3(soup)
-            if extract is not None:
-                self.parser = self.pattern_3
-                return extract, link
-
-            logging.warning("Pattern 3 has failed")
             logging.error("All patterns have failed")
 
             # TODO:: Check for 404 or link removed and then exit
@@ -175,8 +168,8 @@ class ZippyParser():
             return None
 
         part_1 = parts.group(1).replace("\"", '')
-        a = self.get_value_of_var(script, 'a')
-        b = self.get_value_of_var(script, 'b')
+        a = int(self.get_value_of_var(script, 'a'))
+        b = int(self.get_value_of_var(script, 'b'))
         a = math.floor(a / 3)
         part_2 = eval(parts.group(3))
         part_3 = parts.group(5).replace('"', '')
@@ -257,13 +250,55 @@ class ZippyParser():
 
         return extract
 
+    def pattern_4(self, soup):
+        """
+        Fourth pattern in the zippyshare html page to create download link
+        :param soup: Soup for the complete webpage
+        :return: Extracted direct download link
+        """
+        # REGEX_2 = r'(\")(.*)(\/\"\ \+\ )(.*)(\ \+\ \")(.*)(\")'
+        REGEX_2 = r'((\")(.*)(\"))\+(\((.*)\))\+(\"(.*)\")'
 
-if __name__=="__main__":
+        script = ZippyParser.__get_script(soup)
+
+        matcher = re.search(self.REGEX_1, script)
+        if matcher is None:
+            logging.debug('Failed REGEX_1 for pattern 3')
+            return None
+
+        expression = matcher.group(2)
+        parts = re.search(REGEX_2, expression)
+
+        if parts is None:
+            logging.debug('Failed REGEX_2 for pattern 3')
+            return None
+
+        part_1 = parts.group(3)
+        part_3 = parts.group(8)
+
+        script = script.replace('var d = 9;', '')
+
+        a = eval(self.get_value_of_var(script, 'a'))
+        b = eval(self.get_value_of_var(script, 'b'))
+        c = 8
+        d = eval(self.get_value_of_var(script, 'd'))
+
+        part_2 = a * b + c + d
+
+        extract = "{}{}{}".format(part_1, part_2, part_3)
+        extract = re.sub('/pd/', '/d/', extract)
+
+        return extract
+
+
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
-    parser.add_argument('--out-file', dest='outfile', default='links.txt', help='path to file in which resultant links will be stored')
-    parser.add_argument('--dlc', dest='dlcfile', default=None, help='If you have a dlc file, you can use that instead of a txt file')
+    parser.add_argument('--out-file', dest='outfile', default='links.txt',
+                        help='path to file in which resultant links will be stored')
+    parser.add_argument('--dlc', dest='dlcfile', default=None,
+                        help='If you have a dlc file, you can use that instead of a txt file')
 
     args = parser.parse_args()
 

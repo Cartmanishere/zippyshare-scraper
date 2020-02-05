@@ -1,5 +1,9 @@
 #### Updates:
 
+##### 5 Feb 2020
+- Added a fourth pattern based on changed zippyshare logic. Update your scripts.
+
+##### 25 Oct 2019
 - Refactored the different variations of the zippyshare page into a single script.
 - Added multi-threading to speed up link extraction. 
 - Check the new usage method since that is also changed.

@@ -1,5 +1,8 @@
 #### Updates:
 
+##### 18 Feb 2020
+- Added a fifth pattern. Update the scripts. 
+ 
 ##### 5 Feb 2020
 - Added a fourth pattern based on changed zippyshare logic. Update your scripts.
 

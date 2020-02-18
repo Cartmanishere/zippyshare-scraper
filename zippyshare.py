@@ -75,7 +75,8 @@ class ZippyParser():
             parsers = [self.pattern_1,
                        self.pattern_2,
                        self.pattern_3,
-                       self.pattern_4]
+                       self.pattern_4,
+                       self.pattern_5]
 
             for parser_fn in parsers:
                 try:
@@ -256,21 +257,20 @@ class ZippyParser():
         :param soup: Soup for the complete webpage
         :return: Extracted direct download link
         """
-        # REGEX_2 = r'(\")(.*)(\/\"\ \+\ )(.*)(\ \+\ \")(.*)(\")'
         REGEX_2 = r'((\")(.*)(\"))\+(\((.*)\))\+(\"(.*)\")'
 
         script = ZippyParser.__get_script(soup)
 
         matcher = re.search(self.REGEX_1, script)
         if matcher is None:
-            logging.debug('Failed REGEX_1 for pattern 3')
+            logging.debug('Failed REGEX_1 for pattern 4')
             return None
 
         expression = matcher.group(2)
         parts = re.search(REGEX_2, expression)
 
         if parts is None:
-            logging.debug('Failed REGEX_2 for pattern 3')
+            logging.debug('Failed REGEX_2 for pattern 4')
             return None
 
         part_1 = parts.group(3)
@@ -284,6 +284,41 @@ class ZippyParser():
         d = eval(self.get_value_of_var(script, 'd'))
 
         part_2 = a * b + c + d
+
+        extract = "{}{}{}".format(part_1, part_2, part_3)
+        extract = re.sub('/pd/', '/d/', extract)
+
+        return extract
+
+    def pattern_5(self, soup):
+        """
+        Fifth pattern in the zippyshare html page to create download link
+        :param soup: Soup for the complete webpage
+        :return: Extracted direct download link
+        """
+        REGEX_2 = r'((\")(.*)(\"))\+(\((.*)\))\+(\"(.*)\")'
+
+        script = ZippyParser.__get_script(soup)
+
+        matcher = re.search(self.REGEX_1, script)
+        if matcher is None:
+            logging.debug('Failed REGEX_1 for pattern 5')
+            return None
+
+        expression = matcher.group(2)
+        parts = re.search(REGEX_2, expression)
+
+        if parts is None:
+            logging.debug('Failed REGEX_2 for pattern 5')
+            return None
+
+        part_1 = parts.group(3)
+        part_3 = parts.group(8)
+
+        n = eval(self.get_value_of_var(script, 'n'))
+        b = eval(self.get_value_of_var(script, 'b'))
+
+        part_2 = (n + n * 2 + b)
 
         extract = "{}{}{}".format(part_1, part_2, part_3)
         extract = re.sub('/pd/', '/d/', extract)

@@ -76,7 +76,8 @@ class ZippyParser():
                        self.pattern_2,
                        self.pattern_3,
                        self.pattern_4,
-                       self.pattern_5]
+                       self.pattern_5,
+                       self.pattern_6]
 
             for parser_fn in parsers:
                 try:
@@ -325,9 +326,43 @@ class ZippyParser():
 
         return extract
 
+    def pattern_6(self, soup):
+        """
+        Sixth pattern in the zippyshare html page to create download link
+        :param soup: Soup for the complete webpage
+        :return: Extracted direct download link
+        """
+        REGEX_2 = r'((\")(.*)(\"))\+(\((.*)\))\+(\"(.*)\")'
+
+        script = ZippyParser.__get_script(soup)
+
+        matcher = re.search(self.REGEX_1, script)
+        if matcher is None:
+            logging.debug('Failed REGEX_1 for pattern 5')
+            return None
+
+        expression = matcher.group(2)
+        parts = re.search(REGEX_2, expression)
+
+        if parts is None:
+            logging.debug('Failed REGEX_2 for pattern 5')
+            return None
+
+        part_1 = parts.group(3)
+        part_3 = parts.group(8)
+
+        a = eval(self.get_value_of_var(script, 'a'))
+        b = 3
+
+        part_2 = ((a ** 3) + b)
+
+        extract = "{}{}{}".format(part_1, part_2, part_3)
+        extract = re.sub('/pd/', '/d/', extract)
+
+        return extract
+
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
     parser.add_argument('--out-file', dest='outfile', default='links.txt',
@@ -363,4 +398,3 @@ if __name__ == "__main__":
         for link in links:
             f.write(link + '\n')
         zippy.logger.info('All download links saved at {}'.format(args.outfile))
-

@@ -1,14 +1,17 @@
 #### Updates:
 
+##### 23 March 2020
+- Added a sixth pattern. Promise I'm working on a more stable solution.
+
 ##### 18 Feb 2020
-- Added a fifth pattern. Update the scripts. 
- 
+- Added a fifth pattern. Update the scripts.
+
 ##### 5 Feb 2020
 - Added a fourth pattern based on changed zippyshare logic. Update your scripts.
 
 ##### 25 Oct 2019
 - Refactored the different variations of the zippyshare page into a single script.
-- Added multi-threading to speed up link extraction. 
+- Added multi-threading to speed up link extraction.
 - Check the new usage method since that is also changed.
 
 ## Zippyshare Scraper:
@@ -59,7 +62,7 @@ python zippyshare.py --dlc-file <path_to_dlc_file>
 ```
 * Using list: Enter link in the terminal one by one
 
-* After the links are processed, the result is displayed on terminal as well as the direct downloadable links are written to a ```links.txt``` file in the current working directory. 
+* After the links are processed, the result is displayed on terminal as well as the direct downloadable links are written to a ```links.txt``` file in the current working directory.
 You can change the default output file as follows:
 ```
 python zippyshare.py --out-file <output_file_path>
@@ -82,12 +85,11 @@ Example of Direct Downloadable link: ```http://www120.zippyshare.com/d/7DpZTYfi/
 
 ### Known Issues :
 
-* You have to run the script from the same network using which you are downloading files otherwise links may not work. 
+* You have to run the script from the same network using which you are downloading files otherwise links may not work.
 
 * The direct download links stop working after a few hours ( About 3-4 hrs, maybe). Don't know the exact time period.  At that point, you can rerun the script to get new download links to the same files which will work without problem.
 
-* The script runs into an error when the "File not exist" zippyshare page loads. 
+* The script runs into an error when the "File not exist" zippyshare page loads.
 ### License :
 
 This project is licensed under the terms of the MIT license.
-

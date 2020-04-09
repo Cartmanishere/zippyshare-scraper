@@ -67,7 +67,8 @@ class ZippyParser():
             extract = self.parser(soup)
             if extract is None:
                 logging.error('Selected parser {} failed'.format(self.parser.__name__))
-                return None
+                self.parser = None
+                self.get_download_link(link)
 
             return extract, link
         else:

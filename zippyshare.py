@@ -88,7 +88,7 @@ class ZippyParser():
                         return extract, link
                     raise Exception
                 except Exception as e:
-                    logging.warning(parser_fn.__name__ + " has failed")
+                    logging.warning(parser_fn.__name__ + " has failed for link: " + link)
                     logging.warning("Trying next pattern")
 
             logging.error("All patterns have failed")
@@ -119,18 +119,20 @@ class ZippyParser():
         :return:
         """
         rlinks = []
+        failed = []
         count = 0
 
-        with ThreadPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=10) as executor:
             futures = [executor.submit(self.get_download_link, url) for url in links]
             for f in as_completed(futures):
                 extract, link = f.result()
                 if extract is None:
                     self.logger.error('Failed to parse - {}'.format(link))
+                    failed.append(link)
                     continue
                 dlink = ZippyParser.__get_domain(link)[:-1] + extract
                 count += 1
-                self.logger.info('{}/{} links parsed'.format(count, len(links)))
+                self.logger.info('{}/{} links parsed {}'.format(count, len(links), dlink))
                 rlinks.append(dlink)
 
         self.logger.info('Verifying download links...')
@@ -145,7 +147,7 @@ class ZippyParser():
                     count += 1
                     self.logger.info('{}/{} links verified'.format(count, len(rlinks)))
 
-        return flinks
+        return flinks, failed
 
     def pattern_1(self, soup):
         """
@@ -393,9 +395,13 @@ if __name__ == "__main__":
             break
 
     zippy = ZippyParser()
-    links = zippy.parse_links(urls)
+    links, failed = zippy.parse_links(urls)
 
     with open(args.outfile, 'w') as f:
         for link in links:
             f.write(link + '\n')
         zippy.logger.info('All download links saved at {}'.format(args.outfile))
+
+    with open("failed.log", 'w') as f:
+        for link in failed:
+            f.write(link + '\n')

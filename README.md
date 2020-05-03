@@ -1,3 +1,5 @@
+[![Test Status](https://travis-ci.com/Cartmanishere/zippyshare-scraper.svg?branch=master)](https://travis-ci.com/Cartmanishere/zippyshare-scraper)
+
 #### Updates:
 
 ##### 23 March 2020

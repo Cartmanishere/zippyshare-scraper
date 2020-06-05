@@ -45,6 +45,7 @@ In case the script stops working due to one of their updates, please raise an is
 ```
 	pip install requests
 	pip install bs4
+	pip install lxml
 ```
 
 ### Usage :

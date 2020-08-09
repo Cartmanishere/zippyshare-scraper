@@ -78,7 +78,8 @@ class ZippyParser():
                        self.pattern_3,
                        self.pattern_4,
                        self.pattern_5,
-                       self.pattern_6]
+                       self.pattern_6,
+                       self.pattern_7]
 
             for parser_fn in parsers:
                 try:
@@ -358,6 +359,37 @@ class ZippyParser():
         b = 3
 
         part_2 = ((a ** 3) + b)
+
+        extract = "{}{}{}".format(part_1, part_2, part_3)
+        extract = re.sub('/pd/', '/d/', extract)
+
+        return extract
+
+    def pattern_7(self, soup):
+        """
+        Seventh pattern in the zippyshare html page to create download link
+        :param soup: Soup for the complete webpage
+        :return: Extracted direct download link
+        """
+        REGEX_2 = r'(\")(.*)(\") ?\+ ?(.*) ?\+ ?(\")(.*)(\")'
+
+        script = ZippyParser.__get_script(soup)
+
+        matcher = re.search(self.REGEX_1, script)
+        if matcher is None:
+            logging.debug('Failed REGEX_1 for pattern 7')
+            return None
+
+        expression = matcher.group(2)
+        parts = re.search(REGEX_2, expression)
+
+        if parts is None:
+            logging.debug('Failed REGEX_2 for pattern 7')
+            return None
+
+        part_1 = parts.group(2)
+        part_2 = eval(parts.group(4))
+        part_3 = parts.group(6)
 
         extract = "{}{}{}".format(part_1, part_2, part_3)
         extract = re.sub('/pd/', '/d/', extract)

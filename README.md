@@ -2,6 +2,9 @@
 
 #### Updates:
 
+##### 10 August 2020
+- Added a seventh pattern.
+
 ##### 23 March 2020
 - Added a sixth pattern. Promise I'm working on a more stable solution.
 

@@ -33,38 +33,6 @@ def get_script_block(bsobj):
     return reduce(lambda x, y: x + y.text, bsobj.find_all("script"), '')
 
 
-def decrypt_dlc(file):
-    """
-    Given a path to the dlc file, decrypt the file to get the zippyshare links.
-    """
-    # Validate that the given `file` is indeed dlc.
-    if file.split('.')[-1] != 'dlc':
-        # TODO: Replace this with proper logging
-        print('[!] This is not a dlc file. Please provide path to a valid dlc file.')
-        exit(1)
-
-    # Make the api call and decrypt the dlc.
-    try:
-        with open(file, 'r') as f:
-            data = {'content': f.read()}
-        r = requests.post('http://dcrypt.it/decrypt/paste', data=data)
-        # Raise HTTP Exception if got response code other than 200
-        if r.status_code != 200:
-            r.raise_for_status()
-
-        jobj = json.loads(r.content.decode())
-        if jobj.get('success') is None:
-            raise Exception('Dcrypt server did not have `success` key in response.')
-
-        links = jobj.get('success').get('links', [])
-        return links
-
-    except Exception as e:
-        # TODO: Replace this with proper logging
-        print('[*] {}'.format(e))
-        exit(1)
-
-
 def is_valid_link(session, link):
     """
     Verify that the generated link points to a downloadable file.

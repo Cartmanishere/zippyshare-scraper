@@ -1,10 +1,8 @@
-import re
 import argparse
 import requests
-import urllib.parse
+import loaders
 from bs4 import BeautifulSoup
 import logging
-import patterns.utils as utils
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from patterns import *
 
@@ -124,45 +122,51 @@ class ZippyParser:
         return flinks, failed
 
 
-if __name__ == "__main__":
+def load_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
     parser.add_argument('--out-file', dest='outfile', default='links.txt',
                         help='path to file in which resultant links will be stored')
     parser.add_argument('--dlc', dest='dlcfile', default=None,
                         help='If you have a dlc file, you can use that instead of a txt file')
+    parser.add_argument('--filecrypt', dest='filecrypt_url', default=None,
+                        help='Filecrypt link which has a dlc option. Link should not have a captcha or a password.')
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    if args.dlcfile is not None:
-        urls = utils.decrypt_dlc(args.dlcfile)
 
-    elif args.infile is not None:
-        with open(args.infile, 'r') as f:
-            urls = []
-            for line in f:
-                # TODO: Add more cleaning and validation to the links
-                urls.append(line.replace('\r', '').replace('\n', ''))
-
-    else:
-        urls = []
-        while True:
-            ui = input('Enter URLs (leave blank to stop): ')
-            if ui != '':
-                urls.append(ui.strip())
-                continue
-            break
-
-    zippy = ZippyParser()
-    links, failed = zippy.parse_links(urls)
-
+def save_links(success, failed, outfile):
     with open(args.outfile, 'w') as f:
-        for link in links:
+        for link in success:
             f.write(link + '\n')
-        zippy.logger.info('All download links saved at {}'.format(args.outfile))
+        zippy.logger.info('All download links saved at {}'.format(outfile))
 
     with open("failed.log", 'w') as f:
         for link in failed:
             f.write(link + '\n')
         if len(failed) > 0:
             zippy.logger.info('All failed links saved at failed.log')
+
+
+if __name__ == "__main__":
+
+    args = load_args()
+
+    if args.filecrypt_url is not None:
+        urls = loaders.load_from_filecrypt(args.filecrypt_url)
+    elif args.dlcfile is not None:
+        urls = loaders.load_from_dlcfile(args.dlcfile)
+    elif args.infile is not None:
+        urls = loaders.load_from_file(args.infile)
+    else:
+        urls = loaders.load_from_terminal()
+
+    if len(urls) == 0:
+        print('[*] No URLS found!')
+        exit(1)
+
+    zippy = ZippyParser()
+    links, fails = zippy.parse_links(urls)
+
+    save_links(links, fails, args.outfile)
+

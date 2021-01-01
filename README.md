@@ -39,7 +39,7 @@ In case the script stops working due to one of their updates, please raise an is
 * You can run the script directly like -
 ```python zippyshare.py```
 
-You have 3 options to enter links.
+You have 4 options to load links.
 
 * Using file: You can put the zippyshare links in a file. Each link on a new line.
 ```
@@ -47,7 +47,12 @@ python zippyshare.py --in-file <path_to_file_containing_links>
 ```
 * Using dlc: Provide the path of the dlc file.
 ```
-python zippyshare.py --dlc-file <path_to_dlc_file>
+python zippyshare.py --dlc <path_to_dlc_file>
+```
+* Using filecrypt: Provide the url of the filecrypt container. 
+Note: It should not be password or captcha protected.
+```
+python zippyshare.py --filecrypt <filecrypt_url>
 ```
 * Using list: Enter link in the terminal one by one
 

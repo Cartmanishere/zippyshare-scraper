@@ -198,10 +198,10 @@ def pattern_6(soup):
     part_1 = parts.group(3)
     part_3 = parts.group(8)
 
-    a = eval(utils.get_value_var(script, 'a'))
-    b = 3
+    a = math.ceil(eval(utils.get_value_var(script, 'a')) / 3)
+    b = eval(utils.get_value_var(script, 'b'))
 
-    part_2 = ((a ** 3) + b)
+    part_2 = eval(parts.group(5))
 
     extract = "{}{}{}".format(part_1, part_2, part_3)
     extract = re.sub('/pd/', '/d/', extract)

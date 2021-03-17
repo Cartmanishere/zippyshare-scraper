@@ -1,5 +1,9 @@
 #### Updates:
 
+##### 17 March 2021
+- Increased verify retry limit to 8.
+- Updated `pattern_6` function for updated zippyshare.
+
 ##### 22 August 2020
 - Separated the parsing logic and instrumentation logic.
 - Fixed an existing pattern function `(pattern 3)`

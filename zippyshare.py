@@ -74,7 +74,7 @@ class ZippyParser:
         count = 0
         while True:
             count += 1
-            if count > 3:
+            if count > 8:
                 logging.error('{} redirected more than 3 times'.format(link))
                 return None
 

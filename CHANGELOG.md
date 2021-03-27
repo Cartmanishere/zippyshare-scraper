@@ -1,5 +1,8 @@
 #### Updates:
 
+##### 27 Match 2021
+- Added [js2py](https://github.com/PiotrDabkowski/Js2Py.git) engine for generating links.
+
 ##### 17 March 2021
 - Increased verify retry limit to 8.
 - Updated `pattern_6` function for updated zippyshare.

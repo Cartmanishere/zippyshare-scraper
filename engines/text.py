@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
-from concurrent.futures import as_completed, ThreadPoolExecutor
 from engines.patterns import *
 
 # Define supported patterns
@@ -11,11 +10,17 @@ PATTERNS = [pattern_1, pattern_2, pattern_3,
 
 
 class TextEngine:
-    def __init__(self, log_format='[*] %(message)s'):
+    def __init__(self, log_format='[*] %(message)s', logger=None):
         self.sess = requests.Session()
-        logging.basicConfig(level=logging.INFO, format=log_format)
-        self.logger = logging.getLogger('Zippyparse:TextEngine')
+        if logger is None:
+            logging.basicConfig(level=logging.INFO, format=log_format)
+            self.logger = logging.getLogger('Zippyparse:TextEngine')
+        else:
+            self.logger = logger
         self.parser = None
+
+    def __repr__(self):
+        return 'TextEngine'
 
     def get_download_link(self, link):
         """

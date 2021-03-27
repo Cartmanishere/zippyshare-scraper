@@ -4,7 +4,7 @@ import loaders
 from bs4 import BeautifulSoup
 import logging
 from concurrent.futures import as_completed, ThreadPoolExecutor
-from patterns import *
+from engines.patterns import *
 
 # Define supported patterns
 PATTERNS = [pattern_1, pattern_2, pattern_3,

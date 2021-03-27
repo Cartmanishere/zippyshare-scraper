@@ -1,15 +1,10 @@
 import argparse
 import requests
 import loaders
-from bs4 import BeautifulSoup
 import logging
+from engines.text import TextEngine
+from engines.patterns import utils
 from concurrent.futures import as_completed, ThreadPoolExecutor
-from engines.patterns import *
-
-# Define supported patterns
-PATTERNS = [pattern_1, pattern_2, pattern_3,
-            pattern_4, pattern_5, pattern_6,
-            pattern_7]
 
 
 class ZippyParser:
@@ -21,7 +16,7 @@ class ZippyParser:
         self.logger = logging.getLogger('Zippyparse')
         self.parser = None
         self.workers = workers
-
+        self.engine = None
 
     def get_download_link(self, link):
         """
@@ -34,35 +29,15 @@ class ZippyParser:
         If any page fails to parse with a selected pattern, try all other patterns once
         before failing.
         """
-        html = self.sess.get(link)
-        soup = BeautifulSoup(html.content, "lxml")
+        if self.engine is None:
+            self.engine = TextEngine()
 
-        if self.parser is not None:
-            extract = self.parser(soup)
-            if extract is None:
-                logging.error('Selected parser {} failed'.format(self.parser.__name__))
-                self.parser = None
-                self.get_download_link(link)
-
+        extract, link = self.engine.get_download_link(link)
+        if extract is not None:
             return extract, link
         else:
-            # Try and figure out which pattern works
-            parsers = PATTERNS
-
-            for parser_fn in parsers:
-                try:
-                    extract = parser_fn(soup)
-                    if extract is not None:
-                        self.parser = parser_fn
-                        return extract, link
-                    raise Exception
-                except Exception as e:
-                    logging.warning(parser_fn.__name__ + " has failed for link: " + link)
-                    logging.warning("Trying next pattern")
-
-            logging.error("All patterns have failed")
-
-            # TODO:: Check for 404 or link removed and then exit
+            # TODO: Add another engine here.
+            self.logger.error('Engine failed to parse the link - {}'.format(link))
             return None, link
 
     def verify_link(self, link):

@@ -1,8 +1,16 @@
 import re
 import json
 import requests
+import urllib
 from bs4 import BeautifulSoup
-from patterns import utils
+
+
+def get_domain(link):
+    """
+    Given a URL, it returns the domain name.
+    E.g: https://google.com => google.com
+    """
+    return '{uri.scheme}://{uri.netloc}/'.format(uri=urllib.parse.urlparse(link))
 
 
 def decrypt_dlc(contents):

@@ -1,44 +1,37 @@
+import time
 import argparse
 import requests
 import loaders
 import logging
 from engines.text import TextEngine
+from engines.js import JSEngine
 from engines.patterns import utils
 from concurrent.futures import as_completed, ThreadPoolExecutor
 
 
 class ZippyParser:
-
-    def __init__(self, workers=10):
+    def __init__(self, workers=10, engine=None):
         self.sess = requests.Session()
         FORMAT = '[*] %(message)s'
         logging.basicConfig(level=logging.INFO, format=FORMAT)
         self.logger = logging.getLogger('Zippyparse')
         self.parser = None
         self.workers = workers
-        self.engine = None
+        if engine is None:
+            self.engine = JSEngine(logger=self.logger)
+        else:
+            self.engine = engine(logger=self.logger)
+        self.logger.info('Using {} for generating links'.format(self.engine))
 
     def get_download_link(self, link):
         """
         Parse the contents from the Zippyshare site to extract the actual download link
-        of the file. The zippyshare site can have dynamic logic around how to construct
-        the download link. Various patterns have been coded for these.
-
-        We try all the present patters and if one of the pattern is able to successfully
-        parse the zippyshare site, keep using the same pattern for all the remaining links.
-        If any page fails to parse with a selected pattern, try all other patterns once
-        before failing.
+        of the file. The zippyshare site has javascript logic around how to construct
+        the download link.
         """
-        if self.engine is None:
-            self.engine = TextEngine()
 
         extract, link = self.engine.get_download_link(link)
-        if extract is not None:
-            return extract, link
-        else:
-            # TODO: Add another engine here.
-            self.logger.error('Engine failed to parse the link - {}'.format(link))
-            return None, link
+        return extract, link
 
     def verify_link(self, link):
         """
@@ -99,6 +92,8 @@ class ZippyParser:
 
 def load_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--engine', dest='engine', default='js',
+                        help='Link generating engine to use for generating links. Valid options are "js" and "text".')
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
     parser.add_argument('--out-file', dest='outfile', default='links.txt',
                         help='path to file in which resultant links will be stored')
@@ -140,8 +135,14 @@ if __name__ == "__main__":
         print('[*] No URLS found!')
         exit(1)
 
-    zippy = ZippyParser()
-    links, fails = zippy.parse_links(urls)
+    start = time.time()
+    engine = JSEngine
+    if args.engine == 'text':
+        engine = TextEngine
 
+    zippy = ZippyParser(engine=engine)
+    links, fails = zippy.parse_links(urls)
+    end = time.time()
+    print('Time taken: {:.3f}s'.format(end - start))
     save_links(links, fails, args.outfile)
 

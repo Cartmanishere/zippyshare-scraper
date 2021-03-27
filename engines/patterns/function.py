@@ -11,7 +11,7 @@
 # some of the utils I've created around extracting download link from HTML.
 
 import re
-import patterns.utils as utils
+import engines.patterns.utils as utils
 import math
 
 # This has always been common across all patterns

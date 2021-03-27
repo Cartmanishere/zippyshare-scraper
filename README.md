@@ -20,47 +20,64 @@ This script initiates the download of the file to test whether the link is worki
 
 In this way, you can very easily extend the lifetime of your upload without wasting valuable time and bandwidth.
 
-### NOTICE :
 
-Zippyshare sometimes updates their source code on the webpage which breaks the link extraction. This script already takes care of 3 variations of the zippyshare webpage.
-In case the script stops working due to one of their updates, please raise an issue and I will fix it asap.
 ### Dependencies :
 
 1. You need Python 3 environment to execute the script. You can easily install it from [here](https://www.python.org/downloads/).
-2. You need the following packages installed.
+2. Install the python dependencies:
 ```
-	pip install requests
-	pip install bs4
-	pip install lxml
+	pip install requirements.txt
 ```
+
+### Options:
+
+| Arg | Value | Description |
+| --- | --- | --- |
+| `--in-file` | filepath | Path of the file containing zippyshare links to parse. |
+| `--out-file` | filepath | Path of the file in which generated links will be stored. |
+| `--dlc` | filepath | Path of a `.dlc` file. Takes precendence over `--in-file`. |
+| `--filecrypt` | link | Link of a filecrypt container page. Note: It should not have a password or captcha. |
+| `--engine` | `js`/`text`| Which engine to use for generating links. `js` by default. See `Engines` below for explanation. |
+
+### Engines:
+
+**History**
+
+- This library used to work by scraping the zippyshare webpage.
+- Parsing the javascript code to generate the link by regex matching.
+- Whenever the source code of the site changed even slightly, this broke the regex matchers.
+- Hence we ended up multiple different patterns that the site source code can have.
+
+**Update**
+
+- Instead of parsing the javascript using regex matching, the library has switched to executing the javascript code.
+- The pure python implementation of javascript engine [js2py](https://github.com/PiotrDabkowski/Js2Py.git) is used for this.
+- This should make the library more robust.
+
+For now, I am keeping both the different approaches for getting the download links. These are the two engines -- 
+
+- JsEngine
+- TextEngine
+
 
 ### Usage :
 
-* You can run the script directly like -
-```python zippyshare.py```
+1. Input links using an input file -- 
+```python
+python zippyshare.py --in-file input_links.txt --out-file links.txt
+```
 
-You have 4 options to load links.
+2. input links using dlc file -- 
+```python
+python zippyshare.py --dlc filename.dlc --out-file links.txt
+```
 
-* Using file: You can put the zippyshare links in a file. Each link on a new line.
+3. Input links from terminal -- 
+```python
+python zippyshare.py
 ```
-python zippyshare.py --in-file <path_to_file_containing_links>
-```
-* Using dlc: Provide the path of the dlc file.
-```
-python zippyshare.py --dlc <path_to_dlc_file>
-```
-* Using filecrypt: Provide the url of the filecrypt container. 
-Note: It should not be password or captcha protected.
-```
-python zippyshare.py --filecrypt <filecrypt_url>
-```
-* Using list: Enter link in the terminal one by one
 
-* After the links are processed, the result is displayed on terminal as well as the direct downloadable links are written to a ```links.txt``` file in the current working directory.
-You can change the default output file as follows:
-```
-python zippyshare.py --out-file <output_file_path>
-```
+
 #### Examples :
 
 Example of unprocessed link (this type of link will be input): ```http://www120.zippyshare.com/v/7DpZTYfi/file.html```

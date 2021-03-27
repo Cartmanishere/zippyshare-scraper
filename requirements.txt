@@ -9,3 +9,4 @@ requests==2.22.0
 six==1.14.0
 soupsieve==1.9.5
 urllib3==1.25.8
+js2py==0.70

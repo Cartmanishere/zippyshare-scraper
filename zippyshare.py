@@ -1,69 +1,37 @@
+import time
 import argparse
 import requests
 import loaders
-from bs4 import BeautifulSoup
 import logging
+from engines.text import TextEngine
+from engines.js import JSEngine
+from engines.patterns import utils
 from concurrent.futures import as_completed, ThreadPoolExecutor
-from patterns import *
-
-# Define supported patterns
-PATTERNS = [pattern_1, pattern_2, pattern_3,
-            pattern_4, pattern_5, pattern_6,
-            pattern_7]
 
 
 class ZippyParser:
-
-    def __init__(self, workers=10):
+    def __init__(self, workers=10, engine=None):
         self.sess = requests.Session()
         FORMAT = '[*] %(message)s'
         logging.basicConfig(level=logging.INFO, format=FORMAT)
         self.logger = logging.getLogger('Zippyparse')
         self.parser = None
         self.workers = workers
-
+        if engine is None:
+            self.engine = JSEngine(logger=self.logger)
+        else:
+            self.engine = engine(logger=self.logger)
+        self.logger.info('Using {} for generating links'.format(self.engine))
 
     def get_download_link(self, link):
         """
         Parse the contents from the Zippyshare site to extract the actual download link
-        of the file. The zippyshare site can have dynamic logic around how to construct
-        the download link. Various patterns have been coded for these.
-
-        We try all the present patters and if one of the pattern is able to successfully
-        parse the zippyshare site, keep using the same pattern for all the remaining links.
-        If any page fails to parse with a selected pattern, try all other patterns once
-        before failing.
+        of the file. The zippyshare site has javascript logic around how to construct
+        the download link.
         """
-        html = self.sess.get(link)
-        soup = BeautifulSoup(html.content, "lxml")
 
-        if self.parser is not None:
-            extract = self.parser(soup)
-            if extract is None:
-                logging.error('Selected parser {} failed'.format(self.parser.__name__))
-                self.parser = None
-                self.get_download_link(link)
-
-            return extract, link
-        else:
-            # Try and figure out which pattern works
-            parsers = PATTERNS
-
-            for parser_fn in parsers:
-                try:
-                    extract = parser_fn(soup)
-                    if extract is not None:
-                        self.parser = parser_fn
-                        return extract, link
-                    raise Exception
-                except Exception as e:
-                    logging.warning(parser_fn.__name__ + " has failed for link: " + link)
-                    logging.warning("Trying next pattern")
-
-            logging.error("All patterns have failed")
-
-            # TODO:: Check for 404 or link removed and then exit
-            return None, link
+        extract, link = self.engine.get_download_link(link)
+        return extract, link
 
     def verify_link(self, link):
         """
@@ -124,6 +92,8 @@ class ZippyParser:
 
 def load_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--engine', dest='engine', default='js',
+                        help='Link generating engine to use for generating links. Valid options are "js" and "text".')
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
     parser.add_argument('--out-file', dest='outfile', default='links.txt',
                         help='path to file in which resultant links will be stored')
@@ -165,8 +135,14 @@ if __name__ == "__main__":
         print('[*] No URLS found!')
         exit(1)
 
-    zippy = ZippyParser()
-    links, fails = zippy.parse_links(urls)
+    start = time.time()
+    engine = JSEngine
+    if args.engine == 'text':
+        engine = TextEngine
 
+    zippy = ZippyParser(engine=engine)
+    links, fails = zippy.parse_links(urls)
+    end = time.time()
+    print('Time taken: {:.3f}s'.format(end - start))
     save_links(links, fails, args.outfile)
 

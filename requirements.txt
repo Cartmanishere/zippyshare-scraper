@@ -3,7 +3,7 @@ bs4==0.0.1
 certifi==2019.11.28
 chardet==3.0.4
 idna==2.8
-lxml==4.5.0
+lxml==4.6.3
 pybind11==2.5.0
 requests==2.22.0
 six==1.14.0

@@ -1,6 +1,11 @@
 #### Updates:
 
-##### 27 Match 2021
+##### 20 March 2023
+- Added a new pattern for extracting the download link
+- Almost 2 years after the last change only to find out zippyshare is shutting down.
+- It feels like an end of era and I will miss working on this repo.
+
+##### 27 March 2021
 - Added [js2py](https://github.com/PiotrDabkowski/Js2Py.git) engine for generating links.
 
 ##### 17 March 2021

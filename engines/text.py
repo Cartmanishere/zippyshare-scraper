@@ -6,7 +6,7 @@ from engines.patterns import *
 # Define supported patterns
 PATTERNS = [pattern_1, pattern_2, pattern_3,
             pattern_4, pattern_5, pattern_6,
-            pattern_7]
+            pattern_7, pattern_8]
 
 
 class TextEngine:

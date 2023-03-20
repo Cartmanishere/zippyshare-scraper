@@ -235,3 +235,47 @@ def pattern_7(soup):
     extract = re.sub('/pd/', '/d/', extract)
 
     return extract
+
+def pattern_8(soup):
+    """
+    The final one 😢 as zippyshare is closing down.
+    """
+    REGEX_5 = r'(\(\'dlbutton\'\)\.href    = )(.*)(\;)'
+    REGEX_2 = r'(\")(.*)(\") ?\+ ?(.*) ?\+ ?(\")(.*)(\")'
+    REGEX_3 = r'(\(\'dlbutton\'\)\.omg = )(.*)(\;)'
+    REGEX_4 = r'var b = (.*) \* \((.*)\);'
+
+    script = utils.get_script_block(soup)
+    matcher = re.search(REGEX_3, script)
+    if matcher is None:
+        print("[!] REGEX_3 failed for pattern #8")
+        return None
+    omg = eval(matcher.group(2))
+
+    matcher = re.search(REGEX_4, script)
+    if matcher is None:
+        print("[!] REGEX_4 failed for pattern #8")
+        return None
+    b_part = eval(matcher.group(2))
+    b = b_part * omg
+
+    all_matches = re.findall(REGEX_5, script)
+    if all_matches is None:
+        # TODO: Replace this with proper logging
+        print('[!] REGEX_1 failed for pattern #8')
+        return None
+    expression = None
+    for g1, g2, g3 in all_matches:
+        if len(g2) > 18:
+            expression = g2
+            break
+
+    parts = re.search(REGEX_2, expression)
+    part_1 = parts.group(2)
+    part_2 = b + 18
+    part_3 = parts.group(6)
+
+    extract = "{}{}{}".format(part_1, part_2, part_3)
+    extract = re.sub('/pd/', '/d/', extract)
+
+    return extract

@@ -92,7 +92,7 @@ class ZippyParser:
 
 def load_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--engine', dest='engine', default='js',
+    parser.add_argument('--engine', dest='engine', default='text',
                         help='Link generating engine to use for generating links. Valid options are "js" and "text".')
     parser.add_argument('--in-file', dest='infile', default=None, help='path to file containing links to be processed')
     parser.add_argument('--out-file', dest='outfile', default='links.txt',
@@ -136,13 +136,12 @@ if __name__ == "__main__":
         exit(1)
 
     start = time.time()
-    engine = JSEngine
-    if args.engine == 'text':
-        engine = TextEngine
+    engine = TextEngine
+    if args.engine == 'js':
+        engine = JSEngine
 
     zippy = ZippyParser(engine=engine)
     links, fails = zippy.parse_links(urls)
     end = time.time()
     print('Time taken: {:.3f}s'.format(end - start))
     save_links(links, fails, args.outfile)
-
